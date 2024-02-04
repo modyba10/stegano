@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-import lsb.lsb as stego
-import lsb_.decode, lsb_.encode_decode_binary, lsb_.encode_decode_image, lsb_.encode_decode_image
+import  lsb.lsb as  stego
+
 class Ui_MainWindow(object):
 
     #Function to display message/error/information
@@ -45,7 +45,7 @@ class Ui_MainWindow(object):
                 self.displayMsg('Operation cancelled','Operation cancelled by user!')
             else:
                 try:
-                    loss = ""
+                    loss = stego.encode(input_path,text,output_path,password,self.progressBar)
                 except stego.FileError as fe:
                     self.displayMsg('File Error',str(fe),'err')
                 except stego.DataError as de:

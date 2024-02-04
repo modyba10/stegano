@@ -24,6 +24,7 @@ class Ui_MainWindow(object):
             self.lineEdit.setText(chemin_fichier)
 
     # Fonction pour afficher la boîte de dialogue de sauvegarde de fichier
+            
     def sauvegarderFichier(self):
         chemin_sortie = QtWidgets.QFileDialog.getSaveFileName(None, 'Enregistrer le fichier encodé', '', "Fichier PNG (*.png)")[0]
         return chemin_sortie

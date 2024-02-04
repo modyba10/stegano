@@ -1,12 +1,13 @@
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QLabel, QPushButton, QVBoxLayout, QMainWindow
+from inter import Choice  
 
 class MainPage(QMainWindow):
     def __init__(self):
         super(MainPage, self).__init__()
 
         self.setWindowTitle("Steganography Tool")
-        self.setGeometry(100, 100, 400, 200)
+        self.setGeometry(400, 400, 400, 400)
 
         # Utilisation de style CSS pour améliorer l'esthétique
         self.setStyleSheet("""
@@ -14,17 +15,18 @@ class MainPage(QMainWindow):
                 background-color: #f0f0f0;
             }
             QLabel {
-                font-size: 14px;
+                font-size: 16px;
+                font-weight: bold;
                 color: #333;
             }
             QPushButton {
+                font-size: 14px;
+                padding: 8px 16px;
+                margin-top: 8px;
                 background-color: #4CAF50;
                 color: white;
-                padding: 8px 16px;
-                font-size: 14px;
                 border: none;
                 border-radius: 4px;
-                cursor: pointer;
             }
             QPushButton:hover {
                 background-color: #45a049;
@@ -50,23 +52,17 @@ class MainPage(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def show_lsb_interface(self):
-        from lsb_GUI import Ui_MainWindow
-        self.stego_interface = QtWidgets.QMainWindow()
-        ui = Ui_MainWindow()
-        ui.setupUi(self.stego_interface)
+        self.stego_interface = Choice()  # Update class instantiation
         self.stego_interface.show()
         self.close()
 
     def show_fft_interface(self):
-
         from dct_GUI import Ui_MainWindow
         self.stego_interface = QtWidgets.QMainWindow()
         ui = Ui_MainWindow()
         ui.setupUi(self.stego_interface)
         self.stego_interface.show()
         self.close()
-        
-        
 
 if __name__ == "__main__":
     import sys
