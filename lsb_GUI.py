@@ -1,10 +1,4 @@
 #!/usr/bin/python3
-"""
-GUI program for LSB Steganography in Python 3
-Requirements: PyQt5, OpenCV, NumPy, Crypography
-Author: Suman Adhikari
-GitHub: https://github.com/int-main
-"""
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import lsb_algo as stego
