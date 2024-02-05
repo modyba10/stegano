@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QLabel, QPushButton, QVBoxLayout, QMainWindow
-from inter import Choice  
+from dct_GUI import UI_MainWindow
+from lsb_GUI import  MainWindow
 
 class MainPage(QMainWindow):
     def __init__(self):
@@ -39,27 +40,30 @@ class MainPage(QMainWindow):
         layout.addWidget(label)
 
         lsb_button = QPushButton("LSB Steganography")
-        fft_button = QPushButton("DCT Steganography")
+        dct_button = QPushButton("DCT Steganography")
 
         layout.addWidget(lsb_button)
-        layout.addWidget(fft_button)
+        layout.addWidget(dct_button)
 
         lsb_button.clicked.connect(self.show_lsb_interface)
-        fft_button.clicked.connect(self.show_fft_interface)
+        dct_button.clicked.connect(self.show_dct_interface)
 
         central_widget = QtWidgets.QWidget()
         central_widget.setLayout(layout)
         self.setCentralWidget(central_widget)
 
     def show_lsb_interface(self):
-        self.stego_interface = Choice()  # Update class instantiation
+        from lsb_GUI import MainWindow
+        self.stego_interface = QtWidgets.QMainWindow()
+        ui = MainWindow()
+        ui.setupUi(self.stego_interface)
         self.stego_interface.show()
         self.close()
 
-    def show_fft_interface(self):
-        from dct_GUI import Ui_MainWindow
+    def show_dct_interface(self):
+        from dct_GUI import UI_MainWindow
         self.stego_interface = QtWidgets.QMainWindow()
-        ui = Ui_MainWindow()
+        ui = UI_MainWindow()
         ui.setupUi(self.stego_interface)
         self.stego_interface.show()
         self.close()

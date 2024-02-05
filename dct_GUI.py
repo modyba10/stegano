@@ -1,15 +1,15 @@
 #!/usr/bin/python3
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from dct import dct as stego
+import  dct.dct as  stego
 
-class Ui_MainWindow(object):
+class UI_MainWindow(object):
 
-    # Fonction pour afficher un message/erreur/information
-    def afficherMsg(self, titre, msg, ico_type=None):
+    #Function to display message/error/information
+    def displayMsg(self,title,msg,ico_type=None):
         MsgBox = QtWidgets.QMessageBox()
         MsgBox.setText(msg)
-        MsgBox.setWindowTitle(titre)
+        MsgBox.setWindowTitle(title)
         if ico_type == 'err':
             ico = QtWidgets.QMessageBox.Critical
         else:
@@ -17,62 +17,51 @@ class Ui_MainWindow(object):
         MsgBox.setIcon(ico)
         MsgBox.exec()
 
-    # Fonction pour choisir un fichier d'entrée
-    def choisirFichier(self):
-        chemin_fichier = QtWidgets.QFileDialog.getOpenFileName(None, 'Ouvrir le fichier', '', "Fichiers image (*.jpg *.png *.bmp)")[0]
-        if chemin_fichier != '':
-            self.lineEdit.setText(chemin_fichier)
+    #Function to choose input file
+    def getFile(self):
+        file_path = QtWidgets.QFileDialog.getOpenFileName(None, 'Open file','',"Image files (*.jpg *.png *.jpeg)")[0]
+        if file_path != '':
+            self.lineEdit.setText(file_path)
 
-    # Fonction pour afficher la boîte de dialogue de sauvegarde de fichier
-            
-    def sauvegarderFichier(self):
-        chemin_sortie = QtWidgets.QFileDialog.getSaveFileName(None, 'Enregistrer le fichier encodé', '', "Fichier PNG (*.png)")[0]
-        return chemin_sortie
+    #Function to display save file dialog
+    def saveFile(self):
+        output_path = QtWidgets.QFileDialog.getSaveFileName(None, 'Save encoded file','',"PNG File(*.png)")[0]
+        return output_path
 
-    # Fonction pour encoder les données et enregistrer le fichier
-    def encoder(self):
-        chemin_entree = self.lineEdit.text()
-        texte = self.plainTextEdit.toPlainText()
+    #Function to encode data and save file
+    def encode(self):
+
         
-        if chemin_entree == '':
-            self.afficherMsg('Erreur : Aucun fichier choisi', 'Vous devez sélectionner un fichier image en entrée !', 'err')
-        elif texte == '':
-            self.afficherMsg('Le texte est vide', 'Veuillez entrer du texte à cacher !')
-
+        input_path = self.lineEdit.text()
+        text = self.plainTextEdit.toPlainText()
+        
+        if input_path == '':
+            self.displayMsg('Error: No file chosen','You must select input image file!','err')
+        elif text == '':
+            self.displayMsg('Text is empty','Please enter some text to hide!')
+        
         else:
-            chemin_sortie = self.sauvegarderFichier()
-            if chemin_sortie == '':
-                self.afficherMsg('Opération annulée', 'Opération annulée par l\'utilisateur !')
+            output_path = self.saveFile()
+            if output_path == '':
+                self.displayMsg('Operation cancelled','Operation cancelled by user!')
             else:
-                try:
-                    perte = stego.encode(chemin_entree, texte, chemin_sortie)
-                except stego.FileError as fe:
-                    self.afficherMsg('Erreur de fichier', str(fe), 'err')
-                except stego.DataError as de:
-                    self.afficherMsg('Erreur de données', str(de), 'err')
-                else:
-                    self.afficherMsg('Succès', 'Encodé avec succès !\n\nPerte de données d\'image = {:.5f} %'.format(perte))
-                    self.progressBar.setValue(0)
 
-    # Fonction pour décoder les données
-    def decoder(self):
-        chemin_entree = self.lineEdit.text()
-        mot_de_passe = self.lineEdit_3.text()
-        if chemin_entree == '':
-            self.afficherMsg('Erreur : Aucun fichier choisi', 'Vous devez sélectionner un fichier image en entrée !', 'err')
-        elif mot_de_passe == '':
-            self.afficherMsg('Erreur : Aucun mot de passe fourni', 'Veuillez entrer un mot de passe !', 'err')
+                image = stego.DCT().encode_image(input_path, text, output_path)
+
+
+    #Function to decode data
+    def decode(self):
+        input_path = self.lineEdit.text()
+        password = self.lineEdit_3.text()
+        if input_path == '':
+            self.displayMsg('Error: No file chosen','You must select input image file!','err')
+        elif password == '':
+            self.displayMsg('Error: No password given','Please enter a password!','err')
         else:
-            try:
-                donnees = stego.decode(chemin_entree, mot_de_passe, self.progressBar_2)
-            except stego.FileError as fe:
-                self.afficherMsg('Erreur de fichier', str(fe), 'err')
-            except stego.PasswordError as pe:
-                self.afficherMsg('Erreur de mot de passe', str(pe), 'err')
-                self.progressBar_2.setValue(0)
-            else:
-                self.afficherMsg('Succès', 'Décodé avec succès !')
-                self.plainTextEdit_2.document().setPlainText(donnees)
+           
+                data = stego.DCT().decode_image(input_path)
+                self.displayMsg('Success','Decoded successfully!')
+                self.plainTextEdit_2.document().setPlainText(data)
                 self.progressBar_2.setValue(0)
     
     def setupUi(self, MainWindow):
@@ -90,13 +79,18 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem1)
-        self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setObjectName("label")
-        self.horizontalLayout_2.addWidget(self.label)
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setObjectName("label_4")
+        self.horizontalLayout_2.addWidget(self.label_4)
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setObjectName("label_3")
+        self.horizontalLayout_2.addWidget(self.label_3)
         self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit.setObjectName("lineEdit")
         self.horizontalLayout_2.addWidget(self.lineEdit)
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setAutoFillBackground(False)
+        self.pushButton.setAutoDefault(True)
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout_2.addWidget(self.pushButton)
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -106,150 +100,493 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.addItem(spacerItem3)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem4)
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setObjectName("label")
+        self.horizontalLayout.addWidget(self.label)
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout.addWidget(self.label_2)
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.plainTextEdit.setObjectName("plainTextEdit")
-        self.horizontalLayout.addWidget(self.plainTextEdit)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem5)
         self.verticalLayout_5.addLayout(self.horizontalLayout)
-        spacerItem6 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem6)
-        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        spacerItem7 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem7)
-        self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setObjectName("label_3")
-        self.horizontalLayout_3.addWidget(self.label_3)
-        self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit_2.setObjectName("lineEdit_2")
-        self.horizontalLayout_3.addWidget(self.lineEdit_2)
-        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_3.addItem(spacerItem8)
-        self.verticalLayout_5.addLayout(self.horizontalLayout_3)
-        spacerItem9 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem9)
-        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        spacerItem10 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem10)
-        self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar.setProperty("value", 0)
-        self.progressBar.setObjectName("progressBar")
-        self.horizontalLayout_4.addWidget(self.progressBar)
-        spacerItem11 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem11)
-        self.verticalLayout_5.addLayout(self.horizontalLayout_4)
-        spacerItem12 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem12)
-        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
-        spacerItem13 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_6.addItem(spacerItem13)
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setObjectName("pushButton_2")
-        self.horizontalLayout_6.addWidget(self.pushButton_2)
-        spacerItem14 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_6.addItem(spacerItem14)
-        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_3.setObjectName("pushButton_3")
-        self.horizontalLayout_6.addWidget(self.pushButton_3)
-        spacerItem15 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_6.addItem(spacerItem15)
-        self.pushButton_4 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_4.setObjectName("pushButton_4")
-        self.horizontalLayout_6.addWidget(self.pushButton_4)
-        spacerItem16 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_6.addItem(spacerItem16)
-        self.verticalLayout_5.addLayout(self.horizontalLayout_6)
-        spacerItem17 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem17)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
-        spacerItem18 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_5.addItem(spacerItem18)
-        self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setObjectName("label_4")
-        self.horizontalLayout_5.addWidget(self.label_4)
-        self.lineEdit_3 = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit_3.setObjectName("lineEdit_3")
-        self.horizontalLayout_5.addWidget(self.lineEdit_3)
-        spacerItem19 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_5.addItem(spacerItem19)
-        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
-        spacerItem20 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem20)
-        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
-        spacerItem21 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem21)
-        self.progressBar_2 = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar_2.setProperty("value", 0)
-        self.progressBar_2.setObjectName("progressBar_2")
-        self.horizontalLayout_7.addWidget(self.progressBar_2)
-        spacerItem22 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_7.addItem(spacerItem22)
-        self.verticalLayout_5.addLayout(self.horizontalLayout_7)
-        spacerItem23 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem23)
-        self.horizontalLayout_8 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_8.setObjectName("horizontalLayout_8")
-        spacerItem24 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_8.addItem(spacerItem24)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem4)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setObjectName("label_5")
-        self.horizontalLayout_8.addWidget(self.label_5)
-        spacerItem25 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_8.addItem(spacerItem25)
-        self.verticalLayout_5.addLayout(self.horizontalLayout_8)
-        spacerItem26 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem26)
-        self.horizontalLayout_9 = QtWidgets.QHBoxLayout()
-        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
-        spacerItem27 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem27)
+        self.verticalLayout.addWidget(self.label_5)
+        self.label_7 = QtWidgets.QLabel(self.centralwidget)
+        self.label_7.setObjectName("label_7")
+        self.verticalLayout.addWidget(self.label_7)
+        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.plainTextEdit.setObjectName("plainTextEdit")
+        self.verticalLayout.addWidget(self.plainTextEdit)
+        self.verticalLayout_2.addLayout(self.verticalLayout)
+        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem5)
+        self.label_8 = QtWidgets.QLabel(self.centralwidget)
+        self.label_8.setObjectName("label_8")
+        self.verticalLayout_2.addWidget(self.label_8)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.label_9 = QtWidgets.QLabel(self.centralwidget)
+        self.label_9.setObjectName("label_9")
+        self.horizontalLayout_3.addWidget(self.label_9)
+        self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_2.setInputMethodHints(QtCore.Qt.ImhNone)
+        self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.horizontalLayout_3.addWidget(self.lineEdit_2)
+        self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBox.setObjectName("checkBox")
+        self.horizontalLayout_3.addWidget(self.checkBox)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+        spacerItem6 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem6)
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.label_11 = QtWidgets.QLabel(self.centralwidget)
+        self.label_11.setObjectName("label_11")
+        self.horizontalLayout_6.addWidget(self.label_11)
+        self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setTextVisible(True)
+        self.progressBar.setObjectName("progressBar")
+        self.horizontalLayout_6.addWidget(self.progressBar)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_6)
+        spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem7)
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.verticalLayout_2.addWidget(self.pushButton_2, 0, QtCore.Qt.AlignHCenter)
+        self.horizontalLayout_5.addLayout(self.verticalLayout_2)
+        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem8)
+        self.line = QtWidgets.QFrame(self.centralwidget)
+        self.line.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line.setObjectName("line")
+        self.horizontalLayout_5.addWidget(self.line)
+        spacerItem9 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem9)
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.label_6 = QtWidgets.QLabel(self.centralwidget)
+        self.label_6.setObjectName("label_6")
+        self.verticalLayout_4.addWidget(self.label_6)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.label_10 = QtWidgets.QLabel(self.centralwidget)
+        self.label_10.setObjectName("label_10")
+        self.horizontalLayout_4.addWidget(self.label_10)
+        self.lineEdit_3 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_3.setInputMethodHints(QtCore.Qt.ImhNone)
+        self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.lineEdit_3.setObjectName("lineEdit_3")
+        self.horizontalLayout_4.addWidget(self.lineEdit_3)
+        self.checkBox_2 = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBox_2.setObjectName("checkBox_2")
+        self.horizontalLayout_4.addWidget(self.checkBox_2)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_4)
+        spacerItem10 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_4.addItem(spacerItem10)
+        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.verticalLayout_4.addWidget(self.pushButton_3, 0, QtCore.Qt.AlignHCenter)
+        spacerItem11 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_4.addItem(spacerItem11)
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.label_13 = QtWidgets.QLabel(self.centralwidget)
+        self.label_13.setObjectName("label_13")
+        self.horizontalLayout_7.addWidget(self.label_13)
+        self.progressBar_2 = QtWidgets.QProgressBar(self.centralwidget)
+        self.progressBar_2.setEnabled(True)
+        self.progressBar_2.setMaximum(100)
+        self.progressBar_2.setProperty("value", 0)
+        self.progressBar_2.setTextVisible(True)
+        self.progressBar_2.setObjectName("progressBar_2")
+        self.horizontalLayout_7.addWidget(self.progressBar_2)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_7)
+        spacerItem12 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_4.addItem(spacerItem12)
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.label_12 = QtWidgets.QLabel(self.centralwidget)
+        self.label_12.setObjectName("label_12")
+        self.verticalLayout_3.addWidget(self.label_12)
         self.plainTextEdit_2 = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.plainTextEdit_2.setReadOnly(True)
         self.plainTextEdit_2.setObjectName("plainTextEdit_2")
-        self.horizontalLayout_9.addWidget(self.plainTextEdit_2)
-        spacerItem28 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
-        self.horizontalLayout_9.addItem(spacerItem28)
-        self.verticalLayout_5.addLayout(self.horizontalLayout_9)
-        spacerItem29 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
-        self.verticalLayout_5.addItem(spacerItem29)
+        self.verticalLayout_3.addWidget(self.plainTextEdit_2)
+        self.verticalLayout_4.addLayout(self.verticalLayout_3)
+        self.horizontalLayout_5.addLayout(self.verticalLayout_4)
+        spacerItem13 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem13)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+        spacerItem14 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_5.addItem(spacerItem14)
         MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 811, 21))
+        self.menubar.setObjectName("menubar")
+        self.menuHelp = QtWidgets.QMenu(self.menubar)
+        self.menuHelp.setObjectName("menuHelp")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.actionAbout = QtWidgets.QAction(MainWindow)
+        self.actionAbout.setObjectName("actionAbout")
+        self.menuHelp.addAction(self.actionAbout)
+        self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-        # Connecter les signaux aux slots
-        self.pushButton.clicked.connect(self.choisirFichier)
-        self.pushButton_2.clicked.connect(self.encoder)
-        self.pushButton_3.clicked.connect(self.decoder)
-        self.pushButton_4.clicked.connect(self.plainTextEdit.clear)
+        #Slots
+        self.pushButton.clicked.connect(self.getFile)
+        self.pushButton_2.clicked.connect(self.encode)
+        self.pushButton_3.clicked.connect(self.decode)
+        self.checkBox.stateChanged.connect(lambda: self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Normal) if self.checkBox.isChecked() else self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password))
+        self.checkBox_2.stateChanged.connect(lambda: self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Normal) if self.checkBox_2.isChecked() else self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Password))
+
+        #Menu action
+        self.actionAbout.triggered.connect(lambda: self.displayMsg('About','Created by: Suman Adhikari\n\nGitHub: https://github.com/int-main'))
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Steganographie - Outil d\'encodage/décodage"))
-        self.label.setText(_translate("MainWindow", "Fichier image d\'entrée :"))
-        self.pushButton.setText(_translate("MainWindow", "Parcourir..."))
-        self.label_2.setText(_translate("MainWindow", "Texte à cacher :"))
-        self.label_3.setText(_translate("MainWindow", "Mot de passe :"))
-        self.pushButton_2.setText(_translate("MainWindow", "Encoder"))
-        self.pushButton_3.setText(_translate("MainWindow", "Décoder"))
-        self.pushButton_4.setText(_translate("MainWindow", "Effacer"))
-        self.label_4.setText(_translate("MainWindow", "Mot de passe :"))
-        self.label_5.setText(_translate("MainWindow", "Texte extrait :"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Steganography Software"))
+        self.label_4.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Step 1:</span></p></body></html>"))
+        self.label_3.setText(_translate("MainWindow", "Input Image File:"))
+        self.pushButton.setText(_translate("MainWindow", "Choose File"))
+        self.label.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:20pt; font-weight:600; color:#5500ff;\">Encode</span></p></body></html>"))
+        self.label_2.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:20pt; font-weight:600; color:#5500ff;\">Decode</span></p></body></html>"))
+        self.label_5.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Step 2:</span></p></body></html>"))
+        self.label_7.setText(_translate("MainWindow", "Enter text to hide:"))
+        self.label_8.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Step 3:</span></p></body></html>"))
+        self.label_9.setText(_translate("MainWindow", "Enter Password:"))
+        self.checkBox.setText(_translate("MainWindow", "Show Password"))
+        self.label_11.setText(_translate("MainWindow", "Progress:"))
+        self.pushButton_2.setText(_translate("MainWindow", "Encode and Save"))
+        self.label_6.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Step 2:</span></p></body></html>"))
+        self.label_10.setText(_translate("MainWindow", "Enter Password:"))
+        self.checkBox_2.setText(_translate("MainWindow", "Show Password"))
+        self.pushButton_3.setText(_translate("MainWindow", "Decode"))
+        self.label_13.setText(_translate("MainWindow", "Progress:"))
+        self.label_12.setText(_translate("MainWindow", "Decoded Data:"))
+        self.menuHelp.setTitle(_translate("MainWindow", "Help"))
+        self.actionAbout.setText(_translate("MainWindow", "About"))
+
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
+    ui = UI_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+
+#!/usr/bin/python3
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+import  dct.dct as  stego
+
+class UI_MainWindow(object):
+
+    
+
+    #Function to display message/error/information
+    def displayMsg(self,title,msg,ico_type=None):
+        MsgBox = QtWidgets.QMessageBox()
+        MsgBox.setText(msg)
+        MsgBox.setWindowTitle(title)
+        if ico_type == 'err':
+            ico = QtWidgets.QMessageBox.Critical
+        else:
+            ico = QtWidgets.QMessageBox.Information
+        MsgBox.setIcon(ico)
+        MsgBox.exec()
+
+    #Function to choose input file
+    def getFile(self):
+        file_path = QtWidgets.QFileDialog.getOpenFileName(None, 'Open file','',"Image files (*.jpg *.png *.bmp)")[0]
+        if file_path != '':
+            self.lineEdit.setText(file_path)
+
+    #Function to display save file dialog
+    def saveFile(self):
+        output_path = QtWidgets.QFileDialog.getSaveFileName(None, 'Save encoded file','',"PNG File(*.png)")[0]
+        return output_path
+
+    #Function to encode data and save file
+    def encode(self):
+
+        
+        input_path = self.lineEdit.text()
+        text = self.plainTextEdit.toPlainText()
+        
+        if input_path == '':
+            self.displayMsg('Error: No file chosen','You must select input image file!','err')
+        elif text == '':
+            self.displayMsg('Text is empty','Please enter some text to hide!')
+        
+        else:
+            output_path = self.saveFile()
+            if output_path == '':
+                self.displayMsg('Operation cancelled','Operation cancelled by user!')
+            else:
+
+                image = stego.DCT().encode_image(input_path, text, output_path)
+
+
+    #Function to decode data
+    def decode(self):
+        input_path = self.lineEdit.text()
+        password = self.lineEdit_3.text()
+        if input_path == '':
+            self.displayMsg('Error: No file chosen','You must select input image file!','err')
+        elif password == '':
+            self.displayMsg('Error: No password given','Please enter a password!','err')
+        else:
+           
+                data = stego.DCT().decode_image(input_path)
+          
+           
+                self.displayMsg('Success','Decoded successfully!')
+                self.plainTextEdit_2.document().setPlainText(data)
+                self.progressBar_2.setValue(0)
+    
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(811, 575)
+        MainWindow.setAutoFillBackground(False)
+        MainWindow.setStyleSheet("")
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_5.addItem(spacerItem)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem1)
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setObjectName("label_4")
+        self.horizontalLayout_2.addWidget(self.label_4)
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setObjectName("label_3")
+        self.horizontalLayout_2.addWidget(self.label_3)
+        self.lineEdit = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit.setObjectName("lineEdit")
+        self.horizontalLayout_2.addWidget(self.lineEdit)
+        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton.setAutoFillBackground(False)
+        self.pushButton.setAutoDefault(True)
+        self.pushButton.setObjectName("pushButton")
+        self.horizontalLayout_2.addWidget(self.pushButton)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem2)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_2)
+        spacerItem3 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_5.addItem(spacerItem3)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setObjectName("label")
+        self.horizontalLayout.addWidget(self.label)
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setObjectName("label_2")
+        self.horizontalLayout.addWidget(self.label_2)
+        self.verticalLayout_5.addLayout(self.horizontalLayout)
+        self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem4)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.label_5 = QtWidgets.QLabel(self.centralwidget)
+        self.label_5.setObjectName("label_5")
+        self.verticalLayout.addWidget(self.label_5)
+        self.label_7 = QtWidgets.QLabel(self.centralwidget)
+        self.label_7.setObjectName("label_7")
+        self.verticalLayout.addWidget(self.label_7)
+        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.plainTextEdit.setObjectName("plainTextEdit")
+        self.verticalLayout.addWidget(self.plainTextEdit)
+        self.verticalLayout_2.addLayout(self.verticalLayout)
+        spacerItem5 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem5)
+        self.label_8 = QtWidgets.QLabel(self.centralwidget)
+        self.label_8.setObjectName("label_8")
+        self.verticalLayout_2.addWidget(self.label_8)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.label_9 = QtWidgets.QLabel(self.centralwidget)
+        self.label_9.setObjectName("label_9")
+        self.horizontalLayout_3.addWidget(self.label_9)
+        self.lineEdit_2 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_2.setInputMethodHints(QtCore.Qt.ImhNone)
+        self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.horizontalLayout_3.addWidget(self.lineEdit_2)
+        self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBox.setObjectName("checkBox")
+        self.horizontalLayout_3.addWidget(self.checkBox)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_3)
+        spacerItem6 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem6)
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.label_11 = QtWidgets.QLabel(self.centralwidget)
+        self.label_11.setObjectName("label_11")
+        self.horizontalLayout_6.addWidget(self.label_11)
+        self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setTextVisible(True)
+        self.progressBar.setObjectName("progressBar")
+        self.horizontalLayout_6.addWidget(self.progressBar)
+        self.verticalLayout_2.addLayout(self.horizontalLayout_6)
+        spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_2.addItem(spacerItem7)
+        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_2.setObjectName("pushButton_2")
+        self.verticalLayout_2.addWidget(self.pushButton_2, 0, QtCore.Qt.AlignHCenter)
+        self.horizontalLayout_5.addLayout(self.verticalLayout_2)
+        spacerItem8 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem8)
+        self.line = QtWidgets.QFrame(self.centralwidget)
+        self.line.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line.setObjectName("line")
+        self.horizontalLayout_5.addWidget(self.line)
+        spacerItem9 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem9)
+        self.verticalLayout_4 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_4.setObjectName("verticalLayout_4")
+        self.label_6 = QtWidgets.QLabel(self.centralwidget)
+        self.label_6.setObjectName("label_6")
+        self.verticalLayout_4.addWidget(self.label_6)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
+        self.label_10 = QtWidgets.QLabel(self.centralwidget)
+        self.label_10.setObjectName("label_10")
+        self.horizontalLayout_4.addWidget(self.label_10)
+        self.lineEdit_3 = QtWidgets.QLineEdit(self.centralwidget)
+        self.lineEdit_3.setInputMethodHints(QtCore.Qt.ImhNone)
+        self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.lineEdit_3.setObjectName("lineEdit_3")
+        self.horizontalLayout_4.addWidget(self.lineEdit_3)
+        self.checkBox_2 = QtWidgets.QCheckBox(self.centralwidget)
+        self.checkBox_2.setObjectName("checkBox_2")
+        self.horizontalLayout_4.addWidget(self.checkBox_2)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_4)
+        spacerItem10 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_4.addItem(spacerItem10)
+        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_3.setObjectName("pushButton_3")
+        self.verticalLayout_4.addWidget(self.pushButton_3, 0, QtCore.Qt.AlignHCenter)
+        spacerItem11 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_4.addItem(spacerItem11)
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.label_13 = QtWidgets.QLabel(self.centralwidget)
+        self.label_13.setObjectName("label_13")
+        self.horizontalLayout_7.addWidget(self.label_13)
+        self.progressBar_2 = QtWidgets.QProgressBar(self.centralwidget)
+        self.progressBar_2.setEnabled(True)
+        self.progressBar_2.setMaximum(100)
+        self.progressBar_2.setProperty("value", 0)
+        self.progressBar_2.setTextVisible(True)
+        self.progressBar_2.setObjectName("progressBar_2")
+        self.horizontalLayout_7.addWidget(self.progressBar_2)
+        self.verticalLayout_4.addLayout(self.horizontalLayout_7)
+        spacerItem12 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_4.addItem(spacerItem12)
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.label_12 = QtWidgets.QLabel(self.centralwidget)
+        self.label_12.setObjectName("label_12")
+        self.verticalLayout_3.addWidget(self.label_12)
+        self.plainTextEdit_2 = QtWidgets.QPlainTextEdit(self.centralwidget)
+        self.plainTextEdit_2.setReadOnly(True)
+        self.plainTextEdit_2.setObjectName("plainTextEdit_2")
+        self.verticalLayout_3.addWidget(self.plainTextEdit_2)
+        self.verticalLayout_4.addLayout(self.verticalLayout_3)
+        self.horizontalLayout_5.addLayout(self.verticalLayout_4)
+        spacerItem13 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_5.addItem(spacerItem13)
+        self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+        spacerItem14 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        self.verticalLayout_5.addItem(spacerItem14)
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 811, 21))
+        self.menubar.setObjectName("menubar")
+        self.menuHelp = QtWidgets.QMenu(self.menubar)
+        self.menuHelp.setObjectName("menuHelp")
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
+        self.statusbar.setObjectName("statusbar")
+        MainWindow.setStatusBar(self.statusbar)
+        self.actionAbout = QtWidgets.QAction(MainWindow)
+        self.actionAbout.setObjectName("actionAbout")
+        self.menuHelp.addAction(self.actionAbout)
+        self.menubar.addAction(self.menuHelp.menuAction())
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+        #Slots
+        self.pushButton.clicked.connect(self.getFile)
+        self.pushButton_2.clicked.connect(self.encode)
+        self.pushButton_3.clicked.connect(self.decode)
+        self.checkBox.stateChanged.connect(lambda: self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Normal) if self.checkBox.isChecked() else self.lineEdit_2.setEchoMode(QtWidgets.QLineEdit.Password))
+        self.checkBox_2.stateChanged.connect(lambda: self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Normal) if self.checkBox_2.isChecked() else self.lineEdit_3.setEchoMode(QtWidgets.QLineEdit.Password))
+
+        #Menu action
+        self.actionAbout.triggered.connect(lambda: self.displayMsg('About','Created by: Suman Adhikari\n\nGitHub: https://github.com/int-main'))
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "Steganography Software"))
+        self.label_4.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Step 1:</span></p></body></html>"))
+        self.label_3.setText(_translate("MainWindow", "Input Image File:"))
+        self.pushButton.setText(_translate("MainWindow", "Choose File"))
+        self.label.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:20pt; font-weight:600; color:#5500ff;\">Encode</span></p></body></html>"))
+        self.label_2.setText(_translate("MainWindow", "<html><head/><body><p align=\"center\"><span style=\" font-size:20pt; font-weight:600; color:#5500ff;\">Decode</span></p></body></html>"))
+        self.label_5.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Step 2:</span></p></body></html>"))
+        self.label_7.setText(_translate("MainWindow", "Enter text to hide:"))
+        self.label_8.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Step 3:</span></p></body></html>"))
+        self.label_9.setText(_translate("MainWindow", "Enter Password:"))
+        self.checkBox.setText(_translate("MainWindow", "Show Password"))
+        self.label_11.setText(_translate("MainWindow", "Progress:"))
+        self.pushButton_2.setText(_translate("MainWindow", "Encode and Save"))
+        self.label_6.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Step 2:</span></p></body></html>"))
+        self.label_10.setText(_translate("MainWindow", "Enter Password:"))
+        self.checkBox_2.setText(_translate("MainWindow", "Show Password"))
+        self.pushButton_3.setText(_translate("MainWindow", "Decode"))
+        self.label_13.setText(_translate("MainWindow", "Progress:"))
+        self.label_12.setText(_translate("MainWindow", "Decoded Data:"))
+        self.menuHelp.setTitle(_translate("MainWindow", "Help"))
+        self.actionAbout.setText(_translate("MainWindow", "About"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = UI_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
+
+

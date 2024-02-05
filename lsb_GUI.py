@@ -3,7 +3,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import  lsb.lsb as  stego
 
-class Ui_MainWindow(object):
+class MainWindow(object):
 
     #Function to display message/error/information
     def displayMsg(self,title,msg,ico_type=None):
@@ -297,7 +297,7 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
+    ui = MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
